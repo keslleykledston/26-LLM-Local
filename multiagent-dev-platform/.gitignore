@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Next.js
+.next/
+out/
+node_modules/
+.turbo/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+coverage/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables (keep .env.example)
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Qdrant data (if running locally)
+qdrant_storage/
+
+# Docker volumes
+postgres_data/
+qdrant_data/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.~*

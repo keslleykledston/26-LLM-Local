@@ -1,0 +1,23 @@
+# Auto Claude data directory
+.auto-claude/
+
+# Node/Next
+node_modules/
+.next/
+dist/
+
+# Python caches/venv
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+*.log

@@ -1,0 +1,145 @@
+version: 1
+
+defaults:
+  mode: offline_first               # offline_first | hybrid | external_first
+  require_approval: true            # se true, UI precisa aprovar chamadas externas
+  max_external_calls_per_mission: 2  # evita “queimar token”
+  cache_ttl_hours: 720              # 30 dias
+  redact_secrets: true
+  log_payloads: false               # não logar prompts/respostas completas (privacidade)
+  log_metadata: true                # logar modelo, custo estimado, latência, hashes
+  allow_external_code_generation: false  # externo não gera "código principal" por padrão
+  allowed_external_scopes:
+    - "docs_lookup"
+    - "version_check"
+    - "compatibility_check"
+    - "security_cve_summary"
+    - "edge_case_reasoning"
+  denied_external_scopes:
+    - "generate_main_feature_code"
+    - "write_secrets_or_keys"
+    - "exfiltrate_repo_contents"
+
+policy:
+  # O orquestrador só pode chamar IA externa se TODAS as condições passarem
+  gate_conditions:
+    - id: "local_llm_failed"
+      description: "LLM local retornou baixa confiança ou falhou 2 vezes"
+    - id: "rag_insufficient"
+      description: "RAG retornou < min_results ou baixa similaridade"
+    - id: "justification_present"
+      description: "Agente incluiu justificativa técnica e escopo"
+    - id: "budget_ok"
+      description: "custo estimado dentro do limite da missão"
+  rag:
+    min_results: 3
+    min_score: 0.55
+
+cache:
+  enabled: true
+  backend: "sqlite"                 # sqlite | redis
+  sqlite_path: "./apps/orchestrator_api/data/external_cache.sqlite"
+  key_strategy: "prompt_hash+model" # evita duplicar chamadas idênticas
+
+providers:
+  - id: "openai"
+    type: "openai"
+    enabled: true
+    base_url: "https://api.openai.com/v1"
+    api_key_env: "OPENAI_API_KEY"
+    default_model: "gpt-5.2"
+    models:
+      - name: "gpt-5.2"
+        purpose: ["planning", "agentic_coding", "review", "reasoning"]
+        cost_hint: "high"
+      - name: "gpt-4.1"
+        purpose: ["long_context_ref", "implementation_support"]
+        cost_hint: "medium"
+      - name: "o4-mini"
+        purpose: ["fast_reasoning", "triage"]
+        cost_hint: "low"
+    limits:
+      max_calls_per_day: 50
+      max_tokens_per_call: 6000
+    scopes_allowed:
+      - "docs_lookup"
+      - "version_check"
+      - "compatibility_check"
+      - "edge_case_reasoning"
+
+  - id: "anthropic"
+    type: "anthropic"
+    enabled: true
+    base_url: "https://api.anthropic.com"
+    api_key_env: "ANTHROPIC_API_KEY"
+    default_model: "claude-3.5-sonnet"
+    models:
+      - name: "claude-3.5-sonnet"
+        purpose: ["complex_coding", "refactor", "debugging", "agentic_tasks"]
+        cost_hint: "high"
+      - name: "claude-3.5-haiku"
+        purpose: ["quick_fixes", "summaries"]
+        cost_hint: "low"
+    limits:
+      max_calls_per_day: 30
+      max_tokens_per_call: 5000
+    scopes_allowed:
+      - "docs_lookup"
+      - "compatibility_check"
+      - "edge_case_reasoning"
+
+  - id: "google_gemini"
+    type: "gemini"
+    enabled: true
+    base_url: "https://generativelanguage.googleapis.com"
+    api_key_env: "GEMINI_API_KEY"
+    default_model: "gemini-3-flash"
+    models:
+      - name: "gemini-3-flash"
+        purpose: ["fast_iteration", "multimodal", "quick_fixes"]
+        cost_hint: "low"
+      - name: "gemini-2.0-pro"
+        purpose: ["heavier_reasoning", "code_generation"]
+        cost_hint: "medium"
+    limits:
+      max_calls_per_day: 80
+      max_tokens_per_call: 6000
+    scopes_allowed:
+      - "docs_lookup"
+      - "version_check"
+      - "compatibility_check"
+
+  - id: "openrouter"
+    type: "openrouter"
+    enabled: false
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+    default_model: "auto"
+    models:
+      - name: "auto"
+        purpose: ["routing"]
+        cost_hint: "variable"
+    limits:
+      max_calls_per_day: 20
+      max_tokens_per_call: 4000
+    scopes_allowed:
+      - "docs_lookup"
+      - "version_check"
+
+audit:
+  enabled: true
+  store: "postgres"                  # postgres | sqlite
+  table: "external_ai_audit"
+  fields:
+    - "timestamp"
+    - "mission_id"
+    - "agent_id"
+    - "provider_id"
+    - "model"
+    - "scope"
+    - "justification"
+    - "prompt_hash"
+    - "response_hash"
+    - "latency_ms"
+    - "estimated_cost"
+    - "approved_by_user"
