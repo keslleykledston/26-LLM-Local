@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from loguru import logger
 
 from app.core.database import get_db
@@ -18,17 +18,21 @@ router = APIRouter()
 # ━━━ Schemas ━━━
 class MemoryItemCreate(BaseModel):
     """Schema for creating memory item"""
+    model_config = ConfigDict(populate_by_name=True)
+
     type: str = Field(..., pattern="^(adr|playbook|snippet|glossary)$")
     title: str = Field(..., min_length=3, max_length=500)
     content: str = Field(..., min_length=10)
     category: Optional[str] = None
     tags: Optional[List[str]] = []
     approved: bool = False
-    metadata: Optional[dict] = {}
+    item_metadata: Optional[dict] = Field(default_factory=dict, alias="metadata")
 
 
 class MemoryItemResponse(BaseModel):
     """Schema for memory item response"""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
     id: int
     type: str
     title: str
@@ -37,9 +41,6 @@ class MemoryItemResponse(BaseModel):
     tags: Optional[List[str]]
     vector_id: Optional[str]
     approved: bool
-
-    class Config:
-        from_attributes = True
 
 
 class SearchRequest(BaseModel):

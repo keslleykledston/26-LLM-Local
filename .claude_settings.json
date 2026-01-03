@@ -1,0 +1,34 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/**)",
+      "Write(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/**)",
+      "Edit(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/**)",
+      "Glob(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/**)",
+      "Grep(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/**)",
+      "Read(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/.auto-claude/specs/001-integra-o-auto-claude-26-llm-local-com-fallback-co/**)",
+      "Write(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/.auto-claude/specs/001-integra-o-auto-claude-26-llm-local-com-fallback-co/**)",
+      "Edit(/Users/keslleykssantos/Scripts_e_Automacoes/dev/Teste/26-LLM-Local/.auto-claude/specs/001-integra-o-auto-claude-26-llm-local-com-fallback-co/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

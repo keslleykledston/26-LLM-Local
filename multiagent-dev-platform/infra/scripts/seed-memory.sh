@@ -5,7 +5,7 @@
 
 set -e
 
-API_URL="${API_URL:-http://localhost:8000}"
+API_URL="${API_URL:-http://localhost:8001}"
 
 echo "🌱 Seeding initial memory..."
 
@@ -53,6 +53,8 @@ echo ""
 echo "📚 Seeding Playbooks..."
 create_memory_item "playbook" "Creating API Endpoint" "../../memory/playbooks/creating-api-endpoint.md" "backend"
 create_memory_item "playbook" "Implementing RAG Search" "../../memory/playbooks/implementing-rag-search.md" "ai"
+create_memory_item "playbook" "Huawei - Diagnosticar flap BGP" "../../memory/playbooks/huawei_diagnosticar_flap.md" "networking"
+create_memory_item "playbook" "Juniper - Diagnosticar flap BGP" "../../memory/playbooks/junos_diagnosticar_flap.md" "networking"
 
 # Seed Glossary
 echo ""

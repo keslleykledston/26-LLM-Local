@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from app.core.config import settings
-from app.api.v1 import missions, agents, memory, external_ai, health
+from app.api.v1 import missions, agents, memory, external_ai, health, devices
 
 # Configure logging
 logger.remove()
@@ -75,6 +75,7 @@ app.include_router(missions.router, prefix="/api/v1/missions", tags=["Missions"]
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["Agents"])
 app.include_router(memory.router, prefix="/api/v1/memory", tags=["Memory"])
 app.include_router(external_ai.router, prefix="/api/v1/external-ai", tags=["External AI"])
+app.include_router(devices.router, prefix="/api/v1/devices", tags=["Devices"])
 
 @app.on_event("startup")
 async def startup_event():

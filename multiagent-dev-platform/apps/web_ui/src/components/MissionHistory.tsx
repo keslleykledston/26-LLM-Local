@@ -16,6 +16,12 @@ interface Mission {
   updated_at: string
   completed_at?: string | null
   created_by?: string | null
+  metadata?: {
+    error?: string
+    error_trace?: string
+    error_type?: string
+    error_at?: string
+  } | null
 }
 
 interface MissionHistoryProps {
@@ -287,6 +293,24 @@ export default function MissionHistory({ initialFilter = 'all' }: MissionHistory
                       <dt className="font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição Completa:</dt>
                       <dd className="text-slate-600 dark:text-slate-400">{mission.description}</dd>
                     </div>
+                    {mission.metadata?.error && (
+                      <div className="col-span-2">
+                        <dt className="font-medium text-slate-700 dark:text-slate-300 mb-1">Erro:</dt>
+                        <dd className="text-red-600 dark:text-red-400 whitespace-pre-wrap">
+                          {mission.metadata.error}
+                        </dd>
+                        {mission.metadata.error_trace && (
+                          <details className="mt-2">
+                            <summary className="cursor-pointer text-xs text-slate-500 dark:text-slate-400">
+                              Ver log completo
+                            </summary>
+                            <pre className="mt-2 p-3 bg-slate-100 dark:bg-slate-800 text-xs text-slate-700 dark:text-slate-200 rounded-md overflow-auto">
+                              {mission.metadata.error_trace}
+                            </pre>
+                          </details>
+                        )}
+                      </div>
+                    )}
                   </dl>
                 </div>
               )}

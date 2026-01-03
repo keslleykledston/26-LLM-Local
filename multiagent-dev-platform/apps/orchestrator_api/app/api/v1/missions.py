@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from typing import List, Optional, AsyncGenerator
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 import asyncio
 import json
@@ -23,14 +23,18 @@ router = APIRouter()
 # ━━━ Schemas ━━━
 class MissionCreate(BaseModel):
     """Schema for creating a mission"""
+    model_config = ConfigDict(populate_by_name=True)
+
     title: str = Field(..., min_length=3, max_length=500)
     description: str = Field(..., min_length=10)
     created_by: Optional[str] = "user"
-    metadata: Optional[dict] = {}
+    mission_metadata: Optional[dict] = Field(default_factory=dict, alias="metadata")
 
 
 class MissionResponse(BaseModel):
     """Schema for mission response"""
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
     id: int
     title: str
     description: str
@@ -40,14 +44,13 @@ class MissionResponse(BaseModel):
     completed_at: Optional[datetime]
     created_by: Optional[str]
     plan: Optional[dict]
-    metadata: Optional[dict]
-
-    class Config:
-        from_attributes = True
+    mission_metadata: Optional[dict] = Field(default=None, alias="metadata")
 
 
 class TaskResponse(BaseModel):
     """Schema for task response"""
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     mission_id: int
     agent_type: str
@@ -59,9 +62,6 @@ class TaskResponse(BaseModel):
     completed_at: Optional[datetime]
     result: Optional[dict]
     error: Optional[str]
-
-    class Config:
-        from_attributes = True
 
 
 # ━━━ Endpoints ━━━
@@ -88,7 +88,7 @@ async def create_mission(
             description=mission_data.description,
             status="planning",
             created_by=mission_data.created_by,
-            metadata=mission_data.metadata,
+            mission_metadata=mission_data.mission_metadata,
         )
         db.add(mission)
         await db.commit()
@@ -178,6 +178,7 @@ async def stream_missions():
                                 "created_at": mission.created_at.isoformat(),
                                 "updated_at": mission.updated_at.isoformat(),
                                 "completed_at": mission.completed_at.isoformat() if mission.completed_at else None,
+                                "metadata": mission.mission_metadata,
                             }
                             yield f"data: {json.dumps(data)}\n\n"
 

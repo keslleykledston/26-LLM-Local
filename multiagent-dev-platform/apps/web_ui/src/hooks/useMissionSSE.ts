@@ -11,6 +11,12 @@ interface Mission {
   updated_at: string
   completed_at?: string | null
   created_by?: string | null
+  metadata?: {
+    error?: string
+    error_trace?: string
+    error_type?: string
+    error_at?: string
+  } | null
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'

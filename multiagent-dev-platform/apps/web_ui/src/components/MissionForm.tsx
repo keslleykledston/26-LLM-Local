@@ -41,11 +41,13 @@ export default function MissionForm({ onSuccess }: MissionFormProps) {
       onSuccess?.()
     } catch (error: any) {
       console.error('Failed to create mission:', error)
-      // Mostrar erro específico da API se disponível
-      const errorMsg = error?.response?.data?.detail?.[0]?.msg ||
-                       error?.message ||
-                       'Failed to create mission. Please check your inputs.'
-      setError(errorMsg)
+      const errorMsg =
+        error?.payload?.detail?.[0]?.msg ||
+        error?.payload?.detail ||
+        error?.payload?.error ||
+        error?.message ||
+        'Failed to create mission. Please check your inputs.'
+      setError(String(errorMsg))
     } finally {
       setLoading(false)
     }

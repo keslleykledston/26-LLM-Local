@@ -38,7 +38,15 @@ async def init_db():
     try:
         async with engine.begin() as conn:
             # Import all models here to ensure they are registered
-            from app.models import mission, task, agent_execution, external_ai_call, memory_item, validation_result
+            from app.models import (
+                mission,
+                task,
+                agent_execution,
+                device,
+                external_ai_call,
+                memory_item,
+                validation_result,
+            )
 
             # Create all tables
             await conn.run_sync(Base.metadata.create_all)

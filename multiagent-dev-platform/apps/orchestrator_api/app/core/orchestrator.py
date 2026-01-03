@@ -6,6 +6,7 @@ from loguru import logger
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import asyncio
+import traceback
 
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal
@@ -110,6 +111,17 @@ class Orchestrator:
                 raise
             except Exception as e:
                 logger.error(f"❌ Mission #{mission_id} failed: {e}", exc_info=True)
+                error_payload = {
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                    "error_trace": traceback.format_exc(limit=8),
+                    "error_at": datetime.utcnow().isoformat(),
+                }
+                mission.mission_metadata = {
+                    **(mission.mission_metadata or {}),
+                    **error_payload,
+                }
+                await db.commit()
                 await self._update_mission_status(db, mission, "failed")
                 self._cancelled_missions.discard(mission_id)
                 raise
@@ -149,7 +161,7 @@ class Orchestrator:
                 title=task_data["title"],
                 description=task_data.get("description"),
                 status="pending",
-                metadata=task_data.get("metadata", {}),
+                task_metadata=task_data.get("metadata", {}),
             )
             db.add(task)
 
@@ -358,7 +370,7 @@ class Orchestrator:
             content=summary,
             category="mission_summary",
             approved=False,  # Requires manual approval
-            metadata={"mission_id": mission.id},
+            item_metadata={"mission_id": mission.id},
         )
         db.add(memory_item)
         await db.commit()

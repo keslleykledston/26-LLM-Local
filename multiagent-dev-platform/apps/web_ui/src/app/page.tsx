@@ -5,12 +5,13 @@ import { Play, Activity, Database, Cloud, CloudOff } from 'lucide-react'
 import MissionForm from '@/components/MissionForm'
 import MissionList from '@/components/MissionList'
 import MissionHistory from '@/components/MissionHistory'
+import DeviceManager from '@/components/DeviceManager'
 import { api } from '@/lib/api'
 
 export default function Home() {
   const [health, setHealth] = useState<any>(null)
   const [refreshKey, setRefreshKey] = useState(0)
-  const [activeTab, setActiveTab] = useState<'missions' | 'history'>('missions')
+  const [activeTab, setActiveTab] = useState<'missions' | 'history' | 'devices'>('missions')
 
   useEffect(() => {
     checkHealth()
@@ -118,12 +119,24 @@ export default function Home() {
                   >
                     History
                   </button>
+                  <button
+                    onClick={() => setActiveTab('devices')}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === 'devices'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600'
+                    }`}
+                  >
+                    Devices
+                  </button>
                 </div>
               </div>
               {activeTab === 'missions' ? (
                 <MissionList key={refreshKey} />
+              ) : activeTab === 'history' ? (
+                <MissionHistory initialFilter="all" />
               ) : (
-                <MissionHistory initialFilter="completed" />
+                <DeviceManager />
               )}
             </div>
           </div>
