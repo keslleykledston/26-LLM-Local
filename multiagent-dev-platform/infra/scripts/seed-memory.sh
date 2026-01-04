@@ -6,6 +6,7 @@
 set -e
 
 API_URL="${API_URL:-http://localhost:8001}"
+APPROVE_MEMORY="${APPROVE_MEMORY:-false}"
 
 echo "🌱 Seeding initial memory..."
 
@@ -23,7 +24,7 @@ create_memory_item() {
 
     content=$(cat "$file")
 
-    curl -s -X POST "$API_URL/api/v1/memory/" \
+    curl -s --connect-timeout 5 --max-time 30 -X POST "$API_URL/api/v1/memory/" \
         -H "Content-Type: application/json" \
         -d @- <<EOF > /dev/null
 {
@@ -31,7 +32,7 @@ create_memory_item() {
     "title": "$title",
     "content": $(echo "$content" | jq -Rs .),
     "category": "$category",
-    "approved": true
+    "approved": $APPROVE_MEMORY
 }
 EOF
 
